@@ -1,5 +1,7 @@
 library(shinyGridster)
 
+source('dashwidgets.r', local=TRUE)
+
 shinyUI(bootstrapPage(
   tags$head(
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'styles.css'),
@@ -37,9 +39,9 @@ shinyUI(bootstrapPage(
     gridsterItem(col = 1, row = 2, sizex = 1, sizey = 1,
       tags$div(id = "live_gauge", style = "width:250px; height:200px")
     ),
-    gridsterItem(class = "status_grid", col = 3, row = 2, sizex = 1, sizey = 1,
+    gridsterItem(col = 3, row = 2, sizex = 1, sizey = 1,
       tags$div(class = 'grid_title', 'Status'),
-      uiOutput("status")
+      statusOutput('status')
     )
   ),
 
