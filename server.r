@@ -45,15 +45,11 @@ shinyServer(function(input, output, session) {
       main = paste("Last", length(values()), "values"), xlab = NA)
   })
 
-  output$status <- renderUI({
-    if (last(running_mean()) > 400) {
-      tags$div(class = 'grid_bigtext grid_alert', 'Past limit')
-    } else {
-      tagList(
-        tags$div(class = 'grid_bigtext', 'OK'),
-        tags$p('Below threshold (400)')
-      )
-    }
+  output$status <- reactive({
+    if (last(running_mean()) > 200)
+      list(text='Past limit', gridClass='danger')
+    else
+      list(text='OK', subtext='Below threshold (400)')
   })
 
   observe({
