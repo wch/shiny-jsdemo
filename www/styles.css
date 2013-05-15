@@ -1,0 +1,41 @@
+body {
+    background-color: #444;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: x-small;
+}
+
+h1 {
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 400;
+  color: #fff;
+}
+
+
+.gridster .gs_w {
+  border-radius: 5px;
+}
+
+
+.gridster .status_grid {
+  text-align: center;
+  line-height: normal;
+}
+
+div .grid_title {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+div .grid_bigtext {
+  font-weight: bold;
+  font-size: 80px;
+  line-height: 90%;
+}
+
+div .grid_alert {
+  color: #b00;
+}
