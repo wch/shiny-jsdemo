@@ -6,7 +6,8 @@ shinyServer(function(input, output, session) {
   all_values <- 100  # Start with an initial value 100
   max_length <- 80   # Keep a maximum of 80 values
 
-  # Collect new values at timed intervals
+  # Collect new values at timed intervals and adds them to all_values
+  # Returns all_values (reactively)
   values <- reactive({
     # Set the delay to re-run this reactive expression
     invalidateLater(input$delay, session)
@@ -28,7 +29,11 @@ shinyServer(function(input, output, session) {
   # Generate histogram
   output$plotout <- renderPlot({
     hist(values(), col = "#cccccc",
-      main = paste("Last", length(values()), "values"), xlab = NA)
+      main = paste("Last", length(values()), "values"),
+      xlab = paste("Mean =", round(mean(values()), 1 ))
+    )
+
+    abline(v = mean(values()), col = "red", lwd = 2, lt = 2)
   })
 
 
