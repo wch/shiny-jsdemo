@@ -1,8 +1,6 @@
 body {
     background-color: #444;
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    font-size: x-small;
 }
 
 h1 {
@@ -18,8 +16,13 @@ h1 {
   border-radius: 5px;
 }
 
-.gridster .gs_w.danger {
+.gridster .gs_w.alert {
   background-color: #D00;
+  color: #FFF;
+}
+
+.gridster .gs_w.warning {
+  background-color: #fc6;
   color: #FFF;
 }
 
@@ -41,8 +44,4 @@ div .grid_bigtext {
   font-weight: bold;
   font-size: 80px;
   line-height: 90%;
-}
-
-div .grid_alert {
-  color: #b00;
 }

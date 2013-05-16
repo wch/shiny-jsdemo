@@ -10,7 +10,7 @@ The external Javascript libraries used in this app include:
 
 Here's how to run the app:
 
-```R
+```
 # If necessary, install devtools
 # install.packages("devtools")
 
@@ -28,5 +28,5 @@ runGitHub("shiny-jsdemo", "wch")
 
 * [Gridster](http://gridster.net/) is released under the MIT license.
 * [JustGage](http://justgage.com/) is released under the MIT license.
-* [Highcharts](http://www.highcharts.com/) is free for non-commercial use under the [CC BY-NC 3.0 license](http://creativecommons.org/licenses/by-nc/3.0/). For commercial use, a license must be purchased from [http://www.highcharts.com/](http://www.highcharts.com/)
+* [Highcharts](http://www.highcharts.com/) is free for non-commercial use under the [CC BY-NC 3.0 license](http://creativecommons.org/licenses/by-nc/3.0/). For commercial use, a license must be purchased from [http://www.highcharts.com/](http://www.highcharts.com/).
 * All other code in this demo app may be used without restriction. 

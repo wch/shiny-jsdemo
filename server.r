@@ -1,10 +1,9 @@
-
 # Get time with millisecond accuracy
 options(digits.secs=6)
 
 shinyServer(function(input, output, session) {
 
-  all_values <- 100  # Start with initial value 100
+  all_values <- 100  # Start with an initial value 100
   max_length <- 80   # Keep a maximum of 80 values
 
   # Collect new values at timed intervals
@@ -19,46 +18,48 @@ shinyServer(function(input, output, session) {
     # Append to all_values
     all_values <<- c(all_values, new_value)
 
-    # Trim all_values to max_length, dropping values from beginning
-    len <- length(all_values)
-    if (len > max_length) {
-      all_values <<- all_values[(1+len-max_length):len]
-    }
+    # Trim all_values to max_length (dropping values from beginning)
+    all_values <<- last(all_values, n = max_length)
 
     all_values
   })
 
-  # The mean of the last 10 values
-  running_mean <- reactive({
-    vals <- values()
-    len <- length(vals)
 
-    if (len <= 10)  start <- 1
-    else            start <- len - 10
-
-    mean(vals[start:len])
-  })    
-
-
+  # Generate histogram
   output$plotout <- renderPlot({
     hist(values(), col = "#cccccc",
       main = paste("Last", length(values()), "values"), xlab = NA)
   })
 
-  output$status <- reactive({
-    if (last(running_mean()) > 200)
-      list(text='Past limit', gridClass='danger')
-    else
-      list(text='OK', subtext='Below threshold (400)')
-  })
 
+  # Update the value of the gauge
+  # Send custom message (as JSON) to a handler on the client
   observe({
+    running_mean <- mean(last(values(), n = 10))
+
     session$sendCustomMessage(
       type = "setGauge", 
-      message = list(name = "live_gauge", value = round(running_mean(), 1))
+      message = list(name = "live_gauge", value = round(running_mean, 1))
     )
   })
 
+
+  # Output the status text ("OK" vs "Past limit")
+  # When this reactive expression is assigned to an output object, it is
+  # automatically wrapped into an observer (i.e., a reactive endpoint)
+  output$status <- reactive({
+    running_mean <- mean(last(values(), n = 10))
+    if (running_mean > 200)
+      list(text="Past limit", gridClass="alert")
+    else if (running_mean > 150)
+      list(text="Warn", subtext = "Approaching threshold (200)", gridClass="warning")
+    else
+      list(text="OK", subtext="Below threshold (200)")
+  })
+
+
+  # Update the latest value on the graph
+  # Send custom message (as JSON) to a handler on the client
   observe({
     session$sendCustomMessage(
       type = "updateHighchart", 
@@ -67,17 +68,20 @@ shinyServer(function(input, output, session) {
         name = "live_highchart",
         # Send UTC timestamp as a string so we can specify arbitrary precision
         # (large numbers get converted to scientific notation and lose precision)
-        x = sprintf("%20f", as.numeric(Sys.time()) * 1000),
+        x = sprintf("%15.3f", as.numeric(Sys.time()) * 1000),
         y = last(values())
       )
     )
   })
 
-
 })
 
 
-# Return the last element in vector x
-last <- function(x) {
-  x[length(x)]
+# Return the last n elements in vector x
+last <- function(x, n = 1) {
+  start <- length(x) - n + 1
+  if (start < 1)
+    start <- 1
+
+  x[start:length(x)]
 }

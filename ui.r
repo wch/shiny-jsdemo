@@ -11,7 +11,10 @@ shinyUI(bootstrapPage(
     tags$script(src = 'js/justgage.1.0.1.min.js'),
 
     # For Highcharts, http://www.highcharts.com/
-    tags$script(src = 'js/highcharts.js')
+    tags$script(src = 'js/highcharts.js'),
+
+    # For the Shiny output binding for status text
+    tags$script(src = 'shiny_status_binding.js')
   ),
 
   h1("Shiny + Gridster + JustGage + Highcharts"),
@@ -20,28 +23,33 @@ shinyUI(bootstrapPage(
     gridsterItem(col = 1, row = 1, sizex = 1, sizey = 1,
 
       sliderInput("rate", "Rate of growth:",
-        min = -0.25, max = .25, value = .02),
+        min = -0.25, max = .25, value = .02, step = .01),
 
       sliderInput("volatility", "Volatility:",
-        min = 0, max = .5, value = .25),
+        min = 0, max = .5, value = .25, step = .01),
 
       sliderInput("delay", "Delay (ms):",
-        min = 250, max = 5000, value = 3000, step = 250)
+        min = 250, max = 5000, value = 3000, step = 250),
+
+      tags$p(
+        tags$br(),
+        tags$a(href = "https://github.com/wch/shiny-jsdemo", "Source code")
+      )
     ),
     gridsterItem(col = 2, row = 1, sizex = 2, sizey = 1,
       tags$div(id = "live_highchart",
         style="min-width: 200px; height: 230px; margin: 0 auto"
       )
     ),
-    gridsterItem(col = 2, row = 2, sizex = 1, sizey = 1,
-      plotOutput("plotout", height = 250)
-    ),
     gridsterItem(col = 1, row = 2, sizex = 1, sizey = 1,
       tags$div(id = "live_gauge", style = "width:250px; height:200px")
     ),
-    gridsterItem(col = 3, row = 2, sizex = 1, sizey = 1,
+    gridsterItem(col = 2, row = 2, sizex = 1, sizey = 1,
       tags$div(class = 'grid_title', 'Status'),
       statusOutput('status')
+    ),
+    gridsterItem(col = 3, row = 2, sizex = 1, sizey = 1,
+      plotOutput("plotout", height = 250)
     )
   ),
 
@@ -58,11 +66,12 @@ shinyUI(bootstrapPage(
         id: "live_gauge",
         value: 0,
         min: 0,
-        max: 400,
+        max: 200,
         title: "Mean of last 10",
         label: "units"
       });
 
+      // Handle messages for setting gauge
       Shiny.addCustomMessageHandler("setGauge",
         function(message) {
           gauges[message.name].refresh(message.value);
