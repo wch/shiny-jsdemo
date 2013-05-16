@@ -52,9 +52,10 @@ shinyServer(function(input, output, session) {
     if (running_mean > 200)
       list(text="Past limit", gridClass="alert")
     else if (running_mean > 150)
-      list(text="Warn", subtext = "Approaching threshold (200)", gridClass="warning")
+      list(text="Warn", subtext = "Mean of last 10 approaching threshold (200)",
+           gridClass="warning")
     else
-      list(text="OK", subtext="Below threshold (200)")
+      list(text="OK", subtext="Mean of last 10 below threshold (200)")
   })
 
 
