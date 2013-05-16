@@ -31,18 +31,11 @@ shinyServer(function(input, output, session) {
       main = paste("Last", length(values()), "values"), xlab = NA)
   })
 
-
-  # Update the value of the gauge
-  # Send custom message (as JSON) to a handler on the client
-  observe({
+  # Set the value for the gauge
+  output$live_gauge <- reactive({
     running_mean <- mean(last(values(), n = 10))
-
-    session$sendCustomMessage(
-      type = "setGauge", 
-      message = list(name = "live_gauge", value = round(running_mean, 1))
-    )
+    round(running_mean, 1)
   })
-
 
   # Output the status text ("OK" vs "Past limit")
   # When this reactive expression is assigned to an output object, it is
