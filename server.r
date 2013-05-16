@@ -30,7 +30,7 @@ shinyServer(function(input, output, session) {
   output$plotout <- renderPlot({
     hist(values(), col = "#cccccc",
       main = paste("Last", length(values()), "values"),
-      xlab = paste("Mean =", round(mean(values()), 1 ))
+      xlab = paste("Mean =", round(mean(values()), 1))
     )
 
     abline(v = mean(values()), col = "red", lwd = 2, lt = 2)
@@ -75,7 +75,10 @@ shinyServer(function(input, output, session) {
         # Send UTC timestamp as a string so we can specify arbitrary precision
         # (large numbers get converted to scientific notation and lose precision)
         x = sprintf("%15.3f", as.numeric(Sys.time()) * 1000),
-        y = last(values())
+        # Most recent value
+        y0 = last(values()),
+        # Smoothed value (average of last 10)
+        y1 = mean(last(values(), n = 10))
       )
     )
   })
