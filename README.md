@@ -184,4 +184,4 @@ License information
 * [shinyGridster](https://github.com/wch/shiny-gridster), the R package wrapping up Gridster for use with Shiny, is released under the GPL-3 license.
 * [JustGage](http://justgage.com/) is released under the MIT license.
 * [Highcharts](http://www.highcharts.com/) is free for non-commercial use under the [CC BY-NC 3.0 license](http://creativecommons.org/licenses/by-nc/3.0/). For commercial use, a license must be purchased from [http://www.highcharts.com/](http://www.highcharts.com/).
-* All other code in this demo app may be used without restriction.
+* All other code in this demo app is licensed under the [CC0 1.0 license](http://creativecommons.org/publicdomain/zero/1.0/), which puts it in the public domain (or equivalent, depending on your local laws).
