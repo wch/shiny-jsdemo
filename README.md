@@ -1,7 +1,7 @@
 Demo of Shiny integration with third-party Javascript libraries
 ===============================================================
 
-This Shiny app demonstrates how to integrate with Javascript libraries. A live version is here: http://glimmer.rstudio.com/winstontest/dashboard/
+This Shiny app demonstrates how to integrate with Javascript libraries. A live version is here: http://glimmer.rstudio.com/winstontest/shiny-jsdemo/
 
 The external Javascript libraries used in this app include:
 
@@ -47,98 +47,69 @@ gridster(width = 250, height = 250,
 
 ### JustGage
 
-JustGage is added in a quick-and-dirty way. The Javascript library files are included as part of this app, instead of being wrapped up in a separate R package, and some Javascript initialization code is put inline in ui.r.
+JustGage is added in a somewhat modular way. The Javascript library files are included as part of this app, instead of being wrapped up in a separate R package, and some Javascript initialization code is put inline in ui.r.
 
-The JustGage library consists of two Javascript files in /www/js/, raphael.js and justgage.js. These files are included in ui.r. After these files are included, there are two steps to add the gauge. First, a div is added to the page:
+The JustGage library consists of two Javascript files in /www/js/, raphael.js and justgage.js. These files are included in ui.r. 
+
+To generate the appropriate HTML for inserting a JustGage on a web page, there's a function defined in dashwidgets.r, which emits the proper div tag:
 
 ```
-  tags$div(id = "live_gauge", style = "width:250px; height:200px")
+justgageOutput <- function(outputId, width, height) {
+  tags$div(id = outputId, class = "justgage_output", style = sprintf("width:%dpx; height:%dpx", width, height))
+}
 ```
 
-Then a block of Javascript code is added inline to ui.r, which initializes that div when the page is loaded.
+This is inserted in the web page in ui.r, like so:
 
-To update when data is sent from the server, a custom message handler is added which receives the JSON packet and does the appropriate thing with it. This is the Javascript code:
+```
+justgageOutput("live_gauge", width=250, height=200)
+```
+
+An _output binding_ for JustGage is defined in justgage_binding.js. The output binding is an object with a set of methods that allow you to find and talk to the output objects.
+
+Here is the most important method of that output binding, `renderValue()` (with some initialization bits removed). It receives messages from the server, and sets the value of the gauge based on the message:
 
 ```js
-// Handle messages for setting gauge
-Shiny.addCustomMessageHandler("setGauge",
-  function(message) {
-    gauges[message.name].refresh(message.value);
+  renderValue: function(el, data) {
+    $(el).data('gauge').refresh(data);
   }
-);
 ```
 
-And here is the corresponding code that sends the data (from server.r):
+And here is how you send data from the server (from server.r):
 
 ```
-observe({
+# Set the value for the gauge
+# When this reactive expression is assigned to an output object, it is
+# automatically wrapped into an observer (i.e., a reactive endpoint)
+output$live_gauge <- reactive({
   running_mean <- mean(last(values(), n = 10))
-
-  session$sendCustomMessage(
-    type = "setGauge",
-    message = list(name = "live_gauge", value = round(running_mean, 1))
-  )
-})
-```
-
-### Highcharts
-
-The way Highcharts is used in this app is similar to the way JustGage is used. The main difference is that instead of being put inline in ui.r, the Javascript initialization code is contained in a separate file, www/initchart.js.
-
-To place the chart, a div is added to the page in ui.r:
-
-```js
-tags$div(id = "live_highchart",
-  style="min-width: 200px; height: 230px; margin: 0 auto"
-)
-```
-
-Then the chart is initialized with code in initchart.js.
-
-To update values that are sent from the server, a custom message handler is registered (in initchart.js):
-
-```js
-Shiny.addCustomMessageHandler("updateHighchart",
-  function(message) {
-    // Find the chart with the specified name
-    var series = $("#" + message.name).highcharts().series[0];
-
-    // Add a new point
-    series.addPoint([Number(message.x), Number(message.y)], true, true);
-  }
-);
-```
-
-And here is the corresponding code that sends the values, in server.r:
-
-```
-observe({
-  session$sendCustomMessage(
-    type = "updateHighchart",
-    message = list(
-      # Name of chart to update
-      name = "live_highchart",
-      # Send UTC timestamp as a string so we can specify arbitrary precision
-      # (large numbers get converted to scientific notation and lose precision)
-      x = sprintf("%15.3f", as.numeric(Sys.time()) * 1000),
-      y = last(values())
-    )
-  )
+  round(running_mean, 1)
 })
 ```
 
 
 ### Status panel
 
-The status panel (which starts out with the text "OK") is more modularized than JustGage or Highchart in this app.
+The status panel (which starts out with the text "OK") is modularized in a way that's similar to JustGage, except that there's no separate Javascript library for the status panel, because it's pretty simple.
 
-The code that generates the div in ui.r is contained in dashwidgets.r. So in ui.r, only this code is needed to create the status widget:
+The code that generates the div in ui.r is contained in dashwidgets.r:
+
+```
+statusOutput <- function(outputId) {
+  tags$div(id=outputId, class="status_output",
+           tags$div(class = 'grid_bigtext'),
+           tags$p()
+  )
+}
+```
+
+So in ui.r, only this code is needed to add the status widget to the page:
 
 ```
   statusOutput(outputId = 'status')
 ```
 
-Instead of using a custom message handler, it does things in a more proper Shiny way, with a Shiny output binding. The code for this is in shiny_status_binding.js. The `renderValue()` method of the output binding handles the message from the server and updates the text.
+It also uses a custom output binding to handle values sent from the server. The code for this is in shiny_status_binding.js. The `renderValue()` method of the output binding handles the message from the server and updates the text.
 
 ```js
   renderValue: function(el, data) {
@@ -174,7 +145,67 @@ output$status <- reactive({
 })
 ```
 
-Again, compared to the use of JustGage and Highcharts in this app, this is a more proper Shiny way of sending data from the server to the client.
+
+### Highcharts
+
+The Highcharts library is used in a quick-and-dirty way in this app. Instead of using an output binding to handle messages from the server, it uses a custom message handler.
+
+To place the chart, a div is added to the page in ui.r:
+
+```js
+tags$div(id = "live_highchart",
+  style="min-width: 200px; height: 230px; margin: 0 auto"
+)
+```
+
+(With the JustGage example, we wrapped up the HTML-generating code in another function, but in this case, we put it directly into ui.r.)
+
+The chart is initialized when the page loads, with code in www/initchart.js.
+
+To update the graph when new values are sent from the server, a custom message handler is registered with Shiny (in initchart.js):
+
+```js
+Shiny.addCustomMessageHandler("updateHighchart",
+  function(message) {
+    // Find the chart with the specified name
+    var chart = $("#" + message.name).highcharts();
+    var series = chart.series;
+
+    // Add a new point
+    series[0].addPoint([Number(message.x), Number(message.y0)], false, true);
+    series[1].addPoint([Number(message.x), Number(message.y1)], false, true);
+    chart.redraw();
+  }
+);
+```
+
+Why not use an output binding, as with the previous examples? There are two reasons. The first reason is that, in the previous cases, the output value sent from the server represents the entire state of the object; for the JustGage, it's a numeric value, and for the status panel, it's a list-like data structure that specifies the entire state of the panel. For the Highchart, the server is actually sending the latest value, but the state of the object includes several previous values as well. So although it's possible to make an output binding that allows the client side to keep more state information than is sent each time from the server, that is something that is at odds with the conceptual framework that Shiny rests on.
+
+The second reason that the Highchart doesn't use an output binding is much less principled: the custom message handler is a little simpler to code than a proper output binding.
+
+
+Here is the corresponding code that sends the values from the server to the client (in server.r):
+
+```
+# Update the latest value on the graph
+# Send custom message (as JSON) to a handler on the client
+observe({
+  session$sendCustomMessage(
+    type = "updateHighchart",
+    message = list(
+      # Name of chart to update
+      name = "live_highchart",
+      # Send UTC timestamp as a string so we can specify arbitrary precision
+      # (large numbers get converted to scientific notation and lose precision)
+      x = sprintf("%15.3f", as.numeric(Sys.time()) * 1000),
+      # Most recent value
+      y0 = last(values()),
+      # Smoothed value (average of last 10)
+      y1 = mean(last(values(), n = 10))
+    )
+  )
+})
+```
 
 
 License information
