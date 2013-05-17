@@ -30,6 +30,8 @@ runGitHub("shiny-jsdemo", "wch")
 
 This app illustrates several different ways of integrating Javascript code into Shiny apps. They range from modular (putting Javascript and R wrapper code in an R package), to quick-and-dirty (putting Javascript inline in ui.r).
 
+Please keep in mind that this code is experimental, and so it does not necessarily reflect best practices.
+
 ### Gridster
 
 Gridster is used via the [shinyGridster](https://github.com/wch/shiny-gridster) R package. This package abstracts away the HTML- and Javascript-related details for using Gridster, so users of the package can simply write R and Shiny code. Creating an R package the best method if you want to make the Javascript code modular and easily reusable, but it also takes the most work.
