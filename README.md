@@ -75,7 +75,7 @@ Here is the most important method of that output binding, `renderValue()` (with 
   }
 ```
 
-And here is how you send data from the server (from server.r):
+To send data from the server, you simply assign a reactive expression to a value in the `output` object (from server.r):
 
 ```
 # Set the value for the gauge
@@ -87,10 +87,12 @@ output$live_gauge <- reactive({
 })
 ```
 
+A function like `renderText()` could also be used instead of the reactive expression.
+
 
 ### Status panel
 
-The status panel (which starts out with the text "OK") is modularized in a way that's similar to JustGage, except that there's no separate Javascript library for the status panel, because it's pretty simple.
+The status panel (which starts out with the text "OK") is modularized in a way that's similar to JustGage, except that there's no separate Javascript library for the status panel, because it employs just a small amount of Javascript.
 
 The code that generates the div in ui.r is contained in dashwidgets.r:
 
@@ -103,7 +105,7 @@ statusOutput <- function(outputId) {
 }
 ```
 
-So in ui.r, only this code is needed to add the status widget to the page:
+In ui.r, this code is adds the div for the status widget to the page:
 
 ```
   statusOutput(outputId = 'status')
@@ -132,7 +134,7 @@ It also uses a custom output binding to handle values sent from the server. The 
 ```
 
 
-In server.r, the value is sent to the client with code like this:
+In server.r, the value is sent to the client by assigning a reactive expression to the output object:
 
 ```
 output$status <- reactive({
@@ -148,7 +150,7 @@ output$status <- reactive({
 
 ### Highcharts
 
-The Highcharts library is used in a quick-and-dirty way in this app. Instead of using an output binding to handle messages from the server, it uses a custom message handler.
+The Highcharts library is added to this app in a quick-and-dirty way. Instead of using an output binding to handle messages from the server, it uses a custom message handler.
 
 To place the chart, a div is added to the page in ui.r:
 
