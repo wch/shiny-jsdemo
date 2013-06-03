@@ -9,14 +9,14 @@ The external Javascript libraries used in this app include:
 * [JustGage](http://justgage.com/)
 * [Highcharts](http://www.highcharts.com/)
 
-To run the app, you need to have the latest development versions of Shiny and httpuv installed.
-
-
-The latest version of httpuv (1.0.6.2) is in the process of being released to CRAN. Installing the latest version of httpuv requires running some commands from the command-line (outside of R): https://github.com/rstudio/httpuv
+To run the app, you need to have the latest development version of Shiny installed.
 
 After installing httpuv, install shinyGridster and Shiny:
 
 ```
+# Get latest version of httpuv (needed for devel version of Shiny)
+install.packages("httpuv")
+
 # If necessary, install devtools
 # install.packages("devtools")
 
