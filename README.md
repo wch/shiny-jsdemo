@@ -1,3 +1,6 @@
+
+**NOTE: The code in this repository is out of date. Please see a newer demo [here](http://shiny.rstudio.com/gallery/server-to-client-custom-messages.html), and its [source code](https://github.com/rstudio/shiny-examples/tree/master/061-server-to-client-custom-messages).**
+
 Demo of Shiny integration with third-party Javascript libraries
 ===============================================================
 
