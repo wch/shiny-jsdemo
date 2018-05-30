@@ -4,7 +4,7 @@
 Demo of Shiny integration with third-party Javascript libraries
 ===============================================================
 
-This Shiny app demonstrates how to integrate with Javascript libraries. A live version is here: http://glimmer.rstudio.com/winstontest/shiny-jsdemo/
+This Shiny app demonstrates how to integrate with Javascript libraries.
 
 The external Javascript libraries used in this app include:
 
